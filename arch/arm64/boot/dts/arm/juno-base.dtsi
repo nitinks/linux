@@ -193,7 +193,7 @@
 
                 };
         };
-	
+
 	/* main funnel on Juno r0, cssys0 funnel on Juno r1/r2 as per TRM*/
 	main_funnel: funnel@20040000 {
 		compatible = "arm,coresight-dynamic-funnel", "arm,primecell";
