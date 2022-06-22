@@ -157,6 +157,43 @@
 		};
 	};
 
+	main-funnel@20040000 {
+                compatible = "arm,coresight-funnel", "arm,primecell";
+                reg = <0 0x20040000 0 0x1000>;
+
+                clocks = <&soc_smc50mhz>;
+                clock-names = "apb_pclk";
+                power-domains = <&scpi_devpd 0>;
+                ports {
+                        #address-cells = <1>;
+                        #size-cells = <0>;
+
+                        port@0 {
+                                reg = <0>;
+                                main_funnel_out_port: endpoint {
+                                        remote-endpoint = <&etf_in_port>;
+                                };
+                        };
+
+                        port@1 {
+                                reg = <0>;
+                                main_funnel_in_port0: endpoint {
+                                        slave-mode;
+                                        remote-endpoint = <&cluster0_funnel_out_port>;
+                                };
+                        };
+
+                        port@2 {
+                                reg = <1>;
+                                main_funnel_in_port1: endpoint {
+                                        slave-mode;
+                                        remote-endpoint = <&cluster1_funnel_out_port>;
+                                };
+                        };
+
+                };
+        };
+	
 	/* main funnel on Juno r0, cssys0 funnel on Juno r1/r2 as per TRM*/
 	main_funnel: funnel@20040000 {
 		compatible = "arm,coresight-dynamic-funnel", "arm,primecell";
@@ -289,6 +326,42 @@
 		};
 	};
 
+        cluster0-funnel@220c0000 {
+                compatible = "arm,coresight-funnel", "arm,primecell";
+                reg = <0 0x220c0000 0 0x1000>;
+
+                clocks = <&soc_smc50mhz>;
+                clock-names = "apb_pclk";
+                power-domains = <&scpi_devpd 0>;
+                ports {
+                        #address-cells = <1>;
+                        #size-cells = <0>;
+
+                        port@0 {
+                                reg = <0>;
+                                cluster0_funnel_out_port: endpoint {
+                                        remote-endpoint = <&main_funnel_in_port0>;
+                                };
+                        };
+
+                        port@1 {
+                                reg = <0>;
+                                cluster0_funnel_in_port0: endpoint {
+                                        slave-mode;
+                                        remote-endpoint = <&cluster0_etm0_out_port>;
+                                };
+                        };
+
+                        port@2 {
+                                reg = <1>;
+                                cluster0_funnel_in_port1: endpoint {
+                                        slave-mode;
+                                        remote-endpoint = <&cluster0_etm1_out_port>;
+                                };
+                        };
+                };
+        };
+
 	cti0: cti@22020000 {
 		compatible = "arm,coresight-cti-v8-arch", "arm,coresight-cti",
 			     "arm,primecell";
@@ -397,6 +470,56 @@
 			};
 		};
 	};
+
+        cluster1-funnel@230c0000 {
+                compatible = "arm,coresight-funnel", "arm,primecell";
+                reg = <0 0x230c0000 0 0x1000>;
+
+                clocks = <&soc_smc50mhz>;
+                clock-names = "apb_pclk";
+                power-domains = <&scpi_devpd 0>;
+                ports {
+                        #address-cells = <1>;
+                        #size-cells = <0>;
+
+                        port@0 {
+                                reg = <0>;
+                                cluster1_funnel_out_port: endpoint {
+                                        remote-endpoint = <&main_funnel_in_port1>;
+                                };
+                        };
+
+                        port@1 {
+                                reg = <0>;
+                                cluster1_funnel_in_port0: endpoint {
+                                        slave-mode;
+                                        remote-endpoint = <&cluster1_etm0_out_port>;
+                                };
+                        };
+
+                        port@2 {
+                                reg = <1>;
+                                cluster1_funnel_in_port1: endpoint {
+                                        slave-mode;
+                                        remote-endpoint = <&cluster1_etm1_out_port>;
+                                };
+                        };
+                        port@3 {
+                                reg = <2>;
+                                cluster1_funnel_in_port2: endpoint {
+                                        slave-mode;
+                                        remote-endpoint = <&cluster1_etm2_out_port>;
+                                };
+                        };
+                        port@4 {
+                                reg = <3>;
+                                cluster1_funnel_in_port3: endpoint {
+                                        slave-mode;
+                                        remote-endpoint = <&cluster1_etm3_out_port>;
+                                };
+                        };
+                };
+        };
 
 	cti2: cti@23020000 {
 		compatible = "arm,coresight-cti-v8-arch", "arm,coresight-cti",
@@ -556,6 +679,43 @@
 		};
 	};
 
+        coresight-replicator {
+                /*
+                 * Non-configurable replicators don't show up on the
+                 * AMBA bus.  As such no need to add "arm,primecell".
+                 */
+                compatible = "arm,coresight-replicator";
+
+                ports {
+                        #address-cells = <1>;
+                        #size-cells = <0>;
+
+                        /* replicator output ports */
+                        port@0 {
+                                reg = <0>;
+                                replicator_out_port0: endpoint {
+                                        remote-endpoint = <&tpiu_in_port>;
+                                };
+                        };
+
+                        port@1 {
+                                reg = <1>;
+                                replicator_out_port1: endpoint {
+                                        remote-endpoint = <&etr_in_port>;
+                                };
+                        };
+
+                        /* replicator input port */
+                        port@2 {
+                                reg = <0>;
+                                replicator_in_port0: endpoint {
+                                        slave-mode;
+                                        remote-endpoint = <&etf_out_port>;
+                                };
+                        };
+                };
+        };
+	
 	cti5: cti@23320000 {
 		compatible = "arm,coresight-cti-v8-arch", "arm,coresight-cti",
 			     "arm,primecell";
