@@ -715,7 +715,7 @@
                         };
                 };
         };
-	
+
 	cti5: cti@23320000 {
 		compatible = "arm,coresight-cti-v8-arch", "arm,coresight-cti",
 			     "arm,primecell";
